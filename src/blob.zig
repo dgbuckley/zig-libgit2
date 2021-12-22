@@ -114,8 +114,9 @@ pub const Blob = opaque {
 
     pub const FilterOptions = struct {
         flags: BlobFilterFlags = .{},
-        /// The commit to load attributes from, when `FilterFlags.ATTRIBUTES_FROM_COMMIT` is specified.
         commit_id: ?*git.Oid = null,
+        /// The commit to load attributes from, when `FilterFlags.ATTRIBUTES_FROM_COMMIT` is specified.
+        attr_commit_id: git.Oid = .{.id = [_]u8{0}**20},
 
         pub const BlobFilterFlags = packed struct {
             /// When set, filters will not be applied to binary files.
@@ -162,6 +163,7 @@ pub const Blob = opaque {
                 .version = c.GIT_BLOB_FILTER_OPTIONS_VERSION,
                 .flags = @bitCast(u32, self.flags),
                 .commit_id = @ptrCast(?*c.git_oid, self.commit_id),
+                .attr_commit_id = @bitCast(c.git_oid, self.attr_commit_id),
             };
         }
 

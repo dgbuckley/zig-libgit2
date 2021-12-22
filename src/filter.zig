@@ -59,14 +59,17 @@ pub const FilterFlags = packed struct {
 pub const FilterOptions = struct {
     flags: FilterFlags = .{},
 
-    /// The commit to load attributes from, when `FilterFlags.ATTRIBUTES_FROM_COMMIT` is specified.
     commit_id: ?*git.Oid = null,
+
+    /// The commit to load attributes from, when `FilterFlags.ATTRIBUTES_FROM_COMMIT` is specified.
+    attr_commit_id: git.Oid = .{.id = [_]u8{0}**20},
 
     pub fn makeCOptionObject(self: FilterOptions) c.git_filter_options {
         return .{
             .version = c.GIT_FILTER_OPTIONS_VERSION,
             .flags = @bitCast(u32, self.flags),
             .commit_id = @ptrCast(?*c.git_oid, self.commit_id),
+            .attr_commit_id = @bitCast(c.git_oid, self.attr_commit_id),
         };
     }
 };

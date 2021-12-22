@@ -3120,12 +3120,14 @@ pub const Repository = opaque {
     pub const AttributeOptions = struct {
         flags: AttributeFlags,
         commit_id: *git.Oid,
+        attr_commit_id: git.Oid = .{.id = [_]u8{0}**20},
 
         pub fn makeCOptionObject(self: AttributeOptions) c.git_attr_options {
             return .{
                 .version = c.GIT_ATTR_OPTIONS_VERSION,
                 .flags = self.flags.toCType(),
                 .commit_id = @ptrCast(*c.git_oid, self.commit_id),
+                .attr_commit_id = @bitCast(c.git_oid, self.attr_commit_id),
             };
         }
 

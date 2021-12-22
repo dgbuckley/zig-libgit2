@@ -946,6 +946,15 @@ pub const Remote = opaque {
         /// Create the transport to use for this operation. Leave `null` to auto-detect.
         transport: ?fn (out: **git.Transport, owner: *Remote, param: ?*anyopaque) callconv(.C) c_int = null,
 
+        /// Callback invoked immediately before we attempt to connect to the given url. Callers may change the URL
+        /// before the connection by calling git_remote_set_instance_url in the callback.
+        ///
+        /// ## Parameters
+        /// * `remote` - The remote to be connected.
+        /// * `direction` - GIT_DIRECTION_FETCH or GIT_DIRECTION_PUSH.
+        /// * `payload` - Payload provided by the caller.
+        remote_ready: ?fn (remote: *git.Remote, direction: git.Direction, payload: ?*anyopaque) callconv(.C) c_int = null,
+
         // This will be passed to each of the callbacks in this sruct as the last parameter.
         payload: ?*anyopaque = null,
 
@@ -984,6 +993,7 @@ pub const Remote = opaque {
                 .push_update_reference = @ptrCast(c.git_push_update_reference_cb, self.push_update_reference),
                 .push_negotiation = @ptrCast(c.git_push_negotiation, self.push_negotiation),
                 .transport = @ptrCast(c.git_transport_cb, self.transport),
+                .remote_ready = @ptrCast(c.git_remote_ready_cb, self.remote_ready),
                 .payload = self.payload,
                 .resolve_url = @ptrCast(c.git_url_resolve_cb, self.resolve_url),
             };
